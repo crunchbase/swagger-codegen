@@ -2014,14 +2014,6 @@ public class DefaultCodegen {
             word = m.replaceAll(rep);
         }
 
-        // Replace two underscores with $ to support inner classes.
-        p = Pattern.compile("(__)(.)");
-        m = p.matcher(word);
-        while (m.find()) {
-            word = m.replaceFirst("\\$" + m.group(2).toUpperCase());
-            m = p.matcher(word);
-        }
-
         // Remove all underscores
         p = Pattern.compile("(_)(.)");
         m = p.matcher(word);
