@@ -84,8 +84,8 @@ class CrunchbaseApi {
    */
   setSession(res) {
     this.session = {
-      cookies: getCookies(res),
-      user: getUser(res)
+      cookies: this.getCookies(res),
+      user: this.getUser(res)
     };
   }
 
@@ -99,7 +99,7 @@ class CrunchbaseApi {
   /*
    * Gets user from a POST /cb/sessions response.
    */
-  function getUser(res) {
+  getUser(res) {
     if (!(res && res.body && res.body.user))
         throw new CrunchbaseApiError("Could not update session due to malformed response body.");
     return res.body.user;
@@ -108,7 +108,7 @@ class CrunchbaseApi {
   /*
    * Gets cookies from a POST /cb/sessions response.
    */
-  function getCookies(res) {
+  getCookies(res) {
     if (!(res && res.headers && res.headers['set-cookie']))
       throw new CrunchbaseApiError("Could not update session due to missing set-cookie header.");
     const cookies = res.headers['set-cookie'].map(Cookie.parse);
