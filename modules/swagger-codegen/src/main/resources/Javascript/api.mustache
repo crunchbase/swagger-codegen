@@ -32,7 +32,7 @@ class CrunchbaseApi {
     {{/pathParams}}
     // add query string values to path
     const queryParams = {};
-    {{#queryParams}}queryParams.{{baseName}} = {{paramName}};
+    {{#queryParams}}if ({{paramName}} !== undefined) queryParams.{{baseName}} = {{paramName}};
     {{/queryParams}}path += createQueryString(queryParams);
 
     const headers = {};
