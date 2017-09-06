@@ -1,9 +1,21 @@
-# Swagger Code Generator
+# Swagger Code Generator ~ Crunchbase FORK!
 
 [![Build Status](https://travis-ci.org/swagger-api/swagger-codegen.png)](https://travis-ci.org/swagger-api/swagger-codegen)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.swagger/swagger-codegen-project/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/io.swagger/swagger-codegen-project)
 
-:star::star::star: If you would like to contribute, please refer to [guidelines](https://github.com/swagger-api/swagger-codegen/blob/master/CONTRIBUTING.md) and a list of [open tasks](https://github.com/swagger-api/swagger-codegen/issues?q=is%3Aopen+is%3Aissue+label%3A%22Need+community+contribution%22).:star::star::star:
+## Quickstart
+
+Compile the code, skipping the tests:
+
+```
+mvn clean package -DskipTests
+```
+
+Generate the HTTP client, models and supporting files for your desired language: 
+
+```
+java -Dapis -Dmodels -DsupportingFiles -jar modules/swagger-codegen-cli/target/swagger-codegen-cli.jar generate -i cb_services_swagger.yml -l DESIRED_LANGUAGE -o api/
+```
 
 ## Overview
 This is the swagger codegen project, which allows generation of client libraries automatically from a Swagger-compliant server.  

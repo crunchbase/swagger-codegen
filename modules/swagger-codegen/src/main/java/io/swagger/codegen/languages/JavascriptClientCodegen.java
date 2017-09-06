@@ -200,7 +200,7 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
         additionalProperties.put(CodegenConstants.SOURCE_FOLDER, sourceFolder);
 
         // source code
-        supportingFiles.add(new SupportingFile("api.mustache", sourceFolder, "api.js"));
+        supportingFiles.add(new SupportingFile("client.mustache", sourceFolder, "client.js"));
         // node modules
         supportingFiles.add(new SupportingFile("package.mustache", "", "package.json"));
         // docs
