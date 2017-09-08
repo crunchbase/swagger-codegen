@@ -81,7 +81,7 @@ class Client {
     switch(method) {
       case "POST":
         const okStatus = /^2\d{2}$/;
-        if (okStatus.test(res)) this.setSession(res);
+        if (okStatus.test(res.statusCode)) this.setSession(res);
         break;
       case "DELETE":
         this.clearSession();
