@@ -64,7 +64,7 @@ class Client {
         .then(res => {
           // Update the session if necessary
           const path = res.request.uri.path;
-          if (path === "/cb/sessions" || path === "/cb/users")) this.updateSession(res, "{{httpMethod}}");
+          if (path === "/cb/sessions" || path === "/cb/users") this.updateSession(res, "{{httpMethod}}");
           // Reset delay back to zero
           this.delay = 0;
           resolve(res);
@@ -118,7 +118,7 @@ class Client {
       if (!(res && res.body && res.body.user))
         throw new ClientError("Could not update session due to malformed response body.");
       return res.body.user;
-    } else if (path === "/cb/users"))  {
+    } else if (path === "/cb/users")  {
       if (!(res && res.body))
         throw new ClientError("Could not update session due to malformed response body.");
       return res.body;
