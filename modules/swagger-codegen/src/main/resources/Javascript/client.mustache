@@ -112,14 +112,12 @@ class Client {
    * Gets user from a POST /cb/sessions response.
    */
   getUser(res) {
-    if ("{{{path}}}" === "/cb/sessions") {
-      if (!(res && res.body && res.body.user))
-        throw new ClientError("Could not update session due to malformed response body.");
+    if (res && res.body && res.body.user) {
       return res.body.user;
-    } else if ("{{{path}}}" === "/cb/users")  {
-      if (!(res && res.body))
-        throw new ClientError("Could not update session due to malformed response body.");
+    } else if (res && res.body) {
       return res.body;
+    } else {
+      throw new ClientError("Could not update session due to malformed response body.");
     }
   }
 
