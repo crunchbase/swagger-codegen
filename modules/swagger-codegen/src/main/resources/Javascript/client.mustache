@@ -41,10 +41,6 @@ class Client {
     path += createQueryString(queryParams);
 
     const headers = {};
-
-    // Set default headers
-    headers["Content-Type"] = "application/json";
-    headers["Accept"] = "application/json";
     {{#headerParams}}
     // Set header "{{baseName}}" to "{{paramName}}"
     if ({{paramName}} != null) headers["{{baseName}}"] = {{paramName}};
@@ -167,12 +163,17 @@ function createQueryString(queryParams) {
 }
 
 function getRequestOptions(headers, body, method, path) {
+  // Set default headers
+  headers["Content-Type"] = "application/json";
+  headers["Accept"] = "application/json";
+
   return {
     // Config for request-promise module
     json: true,
     resolveWithFullResponse: true,
     simple: false,
     timeout: 10000,
+    time: true,
     // Request details
     uri: path,
     method: method,
