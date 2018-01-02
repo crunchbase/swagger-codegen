@@ -30,8 +30,7 @@ class Client {
     {{/required}}{{/allParams}}
     // Get fully qualified path
     let path = this.url + replaceAll("{{{path}}}", "\\{format\\}", "json");
-    {{#pathParams}}
-    path = replaceAll(path, "\\{" + "{{baseName}}" + "\\}", encodeURIComponent({{{paramName}}}.toString()));
+    {{#pathParams}}path = replaceAll(path, "\\{" + "{{baseName}}" + "\\}", encodeURIComponent({{{paramName}}}.toString()));
     {{/pathParams}}
     const queryParams = {};
     {{#queryParams}}
@@ -42,11 +41,6 @@ class Client {
     path += createQueryString(queryParams);
 
     const headers = {};
-
-    // Set default headers
-    headers["Content-Type"] = "application/json";
-    headers["Accept"] = "application/json";
-
     {{#headerParams}}
     // Set header "{{baseName}}" to "{{paramName}}"
     if ({{paramName}} != null) headers["{{baseName}}"] = {{paramName}};
@@ -57,13 +51,18 @@ class Client {
     // Set authorization headers
     if (this.session && this.session.cookies) options.jar = this.session.cookies;
 
+    return this.makeRequest(options, "{{{path}}}");
+  }
+  {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+
+  makeRequest(options, path) {
     return new Promise((resolve, reject) => {
       // Delay the request if necessary
       setTimeout(() => {
         request(options)
         .then(res => {
           // Update the session if necessary
-          if ("{{{path}}}" === "/cb/sessions" || "{{{path}}}" === "/cb/users") this.updateSession(res, "{{httpMethod}}");
+          if (path === "/cb/sessions" || path === "/cb/users") this.updateSession(res, options.method);
           // Reset delay back to zero
           this.delay = 0;
           resolve(res);
@@ -71,7 +70,6 @@ class Client {
       }, this.delay);
     });
   }
-  {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
 
   /*
    * Routes /cb/sessions response to appropriate handler
@@ -165,12 +163,17 @@ function createQueryString(queryParams) {
 }
 
 function getRequestOptions(headers, body, method, path) {
+  // Set default headers
+  headers["Content-Type"] = "application/json";
+  headers["Accept"] = "application/json";
+
   return {
     // Config for request-promise module
     json: true,
     resolveWithFullResponse: true,
     simple: false,
     timeout: 10000,
+    time: true,
     // Request details
     uri: path,
     method: method,
