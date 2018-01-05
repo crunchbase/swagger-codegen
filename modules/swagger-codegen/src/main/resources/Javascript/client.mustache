@@ -66,6 +66,8 @@ class Client {
           // Reset delay back to zero
           this.delay = 0;
           resolve(res);
+        }, err => {
+          reject(`Request failed: ${err}`);
         });
       }, this.delay);
     });
