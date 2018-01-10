@@ -1,0 +1,62 @@
+{{>licenseInfo}}
+
+// scalastyle:off
+package {{package}}
+
+import com.crunchbase.metadata.dto.formatters._
+import spray.json._
+{{#imports}}
+import {{import}}
+{{/imports}}
+
+{{#models}}
+{{#model}}
+case class {{classname}} (
+{{#vars}}
+  {{#description}}
+  /* {{{description}}} */
+  {{/description}}
+  {{#isEnum}}
+    {{^isListContainer}}
+  {{{name}}}: {{^required}}Option[{{/required}}{{classname}}.{{datatypeWithEnum}}{{^required}}]{{/required}}{{#hasMore}},{{/hasMore}}
+    {{/isListContainer}}
+    {{#isListContainer}}
+  {{{name}}}: {{^required}}Option[{{/required}}Seq[{{classname}}.{{enumName}}]{{^required}}]{{/required}}{{#hasMore}},{{/hasMore}}
+    {{/isListContainer}}
+  {{/isEnum}}
+  {{^isEnum}}
+  {{{name}}}: {{^required}}Option[{{/required}}{{datatype}}{{^required}}]{{/required}}{{#hasMore}},{{/hasMore}}
+  {{/isEnum}}
+{{/vars}}
+){{#parent}} extends {{parent}}{{/parent}}
+
+object {{classname}} {
+{{#vars}}
+  {{#isEnum}}
+  type {{enumName}} = {{enumName}}.Value
+  {{/isEnum}}
+{{/vars}}
+{{#vars}}
+  {{#isEnum}}
+  object {{enumName}} extends Enumeration {
+    val {{#allowableValues}}{{#values}}`{{.}}`{{^-last}}, {{/-last}}{{/values}} = Value{{/allowableValues}}
+  }
+  {{/isEnum}}
+{{/vars}}
+  object Formatters {
+  {{#vars}}
+    {{#isEnum}}
+    implicit val `format:{{classname}}{{datatypeWithEnum}}` = EnumFormat.jsonFormatEnum({{enumName}})
+    {{/isEnum}}
+  {{/vars}}
+    object Formatter extends JsonProtocol {
+      def apply(){{#hasFormatRequiredVars}}(implicit
+      {{#formatRequiredVars}}
+        `format:{{{datatype}}}`: JsonFormat[{{datatype}}]{{#hasMore}},{{/hasMore}}
+      {{/formatRequiredVars}}
+      ){{/hasFormatRequiredVars}}: RootJsonFormat[{{classname}}] = jsonFormat{{vars.size}}({{classname}}.apply)
+    }
+  }
+}
+{{/model}}
+{{/models}}
