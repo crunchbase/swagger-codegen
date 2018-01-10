@@ -4,7 +4,7 @@
     <groupId>io.swagger</groupId>
     <artifactId>spray-json-swagger-codegen</artifactId>
     <packaging>jar</packaging>
-    <name>default-swagger-codegen</name>
+    <name>spray-json-swagger-codegen</name>
     <version>1.0.0</version>
     <build>
         <plugins>
