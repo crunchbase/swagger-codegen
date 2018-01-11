@@ -4,19 +4,10 @@
 
 const request = require('request-promise');
 const Cookie = require('tough-cookie').Cookie;
+const CONFIG = require("../../../config.json");
+const flags = require("yargs").argv;
 
 class Client {
-  constructor(url) {
-
-    // Trim trailing slash if necessary
-    if (url.substring(url.length - 1, url.length) == '/') {
-      url = url.substring(0, url.length - 1);
-    }
-
-    this.url = url;
-    this.session = null;
-    this.delay = 0;
-  }
   {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
   /*
    * {{summary}}
@@ -24,12 +15,12 @@ class Client {
 {{#allParams}}   * @param {{=<% %>=}}{<% dataType %>} <%={{ }}=%> {{paramName}} {{description}}
 {{/allParams}}   * @return Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>
    */
-  {{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+  static {{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
     {{#allParams}}{{#required}}if ({{paramName}} == null) 
       throw new ClientError("Missing required parameter '{{paramName}}' when calling {{nickname}}");
     {{/required}}{{/allParams}}
     // Get fully qualified path
-    let path = this.url + replaceAll("{{{path}}}", "\\{format\\}", "json");
+    let path = replaceAll("{{{path}}}", "\\{format\\}", "json");
     {{#pathParams}}path = replaceAll(path, "\\{" + "{{baseName}}" + "\\}", encodeURIComponent({{{paramName}}}.toString()));
     {{/pathParams}}
     const queryParams = {};
@@ -49,97 +40,25 @@ class Client {
     const options = getRequestOptions(headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}}, "{{httpMethod}}", path);
 
     // Set authorization headers
-    if (this.session && this.session.cookies) options.jar = this.session.cookies;
+    // if (this.session && this.session.cookies) options.jar = this.session.cookies;
 
-    return this.makeRequest(options, "{{{path}}}");
+    return this.makeRequest !== undefined ? this.makeRequest(options) : makeRequest(options);
   }
   {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
 
-  makeRequest(options, path) {
-    return new Promise((resolve, reject) => {
-      // Delay the request if necessary
-      setTimeout(() => {
-        request(options)
-        .then(res => {
-          // Update the session if necessary
-          if (path === "/cb/sessions" || path === "/cb/users") this.updateSession(res, options.method);
-          // Reset delay back to zero
-          this.delay = 0;
-          resolve(res);
-        }, err => {
-          reject(`Request failed: ${err}`);
-        });
-      }, this.delay);
-    });
-  }
-
-  /*
-   * Routes /cb/sessions response to appropriate handler
-   * based on HTTP method.
-   */
-  updateSession(res, method) {
-    switch(method) {
-      case "POST":
-        const okStatus = /^2\d{2}$/;
-        if (okStatus.test(res.statusCode)) this.setSession(res);
-        break;
-      case "DELETE":
-        this.clearSession();
-        break;
-      default:
-        return;
-    }
-  }
-
-  /*
-   * Sets the session property from a POST /cb/sessions response.
-   */
-  setSession(res) {
-    this.session = {
-      cookies: this.getCookies(res),
-      user: this.getUser(res)
-    };
-  }
-
-  /*
-   * Unsets the session property.
-   */
-  clearSession() {
-    this.session = null;
-  }
-
-  /*
-   * Gets user from a POST /cb/sessions response.
-   */
-  getUser(res) {
-    if (res && res.body && res.body.user) {
-      return res.body.user;
-    } else if (res && res.body) {
-      return res.body;
-    } else {
-      throw new ClientError("Could not update session due to malformed response body.");
-    }
-  }
-
-  /*
-   * Gets cookies from a POST /cb/sessions response.
-   */
-  getCookies(res) {
-    if (!(res && res.headers && res.headers['set-cookie']))
-      throw new ClientError("Could not update session due to missing set-cookie header.");
-    const cookies = res.headers['set-cookie'].map(Cookie.parse);
-    const jar = request.jar();
-    cookies.forEach(cookie => {
-      jar.setCookie(cookie, this.url);
-    });
-    return jar;
-  }
-
-  wait(ms) {
-    if (!Number.isInteger(ms)) throw new ClientError('Delay param must be an integer.');
-    this.delay = ms;
-  }
 }
+
+function makeRequest(options) {
+  return new Promise((resolve, reject) => {
+    request(options)
+    .then(res => {
+      resolve(res);
+    }, err => {
+      reject(`Request failed: ${err}`);
+    });
+  });
+}
+
 
 function replaceAll(haystack, needle, replace) {
   let result = haystack;
@@ -177,7 +96,7 @@ function getRequestOptions(headers, body, method, path) {
     timeout: 10000,
     time: true,
     // Request details
-    uri: path,
+    uri: CONFIG.environments[flags.env].domains.main + path,
     method: method,
     headers: headers,
     body: body
