@@ -1,6 +1,7 @@
 {{>licenseInfo}}
 
 // scalastyle:off
+// format: OFF
 package {{package}}
 
 import com.crunchbase.metadata.dto.formatters._
@@ -39,7 +40,8 @@ object {{classname}} {
 {{#vars}}
   {{#isEnum}}
   object {{enumName}} extends Enumeration {
-    val {{#allowableValues}}{{#values}}`{{.}}`{{^-last}}, {{/-last}}{{/values}} = Value{{/allowableValues}}
+    val {{#allowableValues}}{{#values}}`{{.}}`{{^-last}},
+        {{/-last}}{{/values}} = Value{{/allowableValues}}
   }
   {{/isEnum}}
 {{/vars}}
