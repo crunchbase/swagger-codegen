@@ -6,15 +6,6 @@ const request = require('request-promise');
 const Cookie = require('tough-cookie').Cookie;
 
 class Client {
-  constructor(url) {
-
-    // Trim trailing slash if necessary
-    if (url.substring(url.length - 1, url.length) == '/') {
-      url = url.substring(0, url.length - 1);
-    }
-
-    this.url = url;
-  }
   {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
   /*
    * {{summary}}
@@ -22,12 +13,12 @@ class Client {
 {{#allParams}}   * @param {{=<% %>=}}{<% dataType %>} <%={{ }}=%> {{paramName}} {{description}}
 {{/allParams}}   * @return Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>
    */
-  {{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+  static {{nickname}}(host, session, {{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
     {{#allParams}}{{#required}}if ({{paramName}} == null) 
       throw new ClientError("Missing required parameter '{{paramName}}' when calling {{nickname}}");
     {{/required}}{{/allParams}}
     // Get fully qualified path
-    let path = replaceAll("{{{path}}}", "\\{format\\}", "json");
+    let path = host + replaceAll("{{{path}}}", "\\{format\\}", "json");
     {{#pathParams}}path = replaceAll(path, "\\{" + "{{baseName}}" + "\\}", encodeURIComponent({{{paramName}}}.toString()));
     {{/pathParams}}
     const queryParams = {};
@@ -43,43 +34,14 @@ class Client {
     // Set header "{{baseName}}" to "{{paramName}}"
     if ({{paramName}} != null) headers["{{baseName}}"] = {{paramName}};
     {{/headerParams}}
-    // Get request-promise module options from params, with defaults
-    const options = this.getRequestOptions(headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}}, "{{httpMethod}}", path);
 
-    return this.makeRequest(options);
+    // Get request-promise module options from params, with defaults
+    const options = getRequestOptions(path, "{{httpMethod}}", headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}}, session);
+    return makeRequest(options);
   }
   {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
 
-  getRequestOptions(headers, body, method, path) {
-    // Set default headers
-    headers["Content-Type"] = "application/json";
-    headers["Accept"] = "application/json";
 
-    return {
-      // Config for request-promise module
-      json: true,
-      resolveWithFullResponse: true,
-      simple: false,
-      timeout: 10000,
-      time: true,
-      // Request details
-      uri: this.url + path,
-      method: method,
-      headers: headers,
-      body: body
-    };
-  }
-
-  makeRequest(options) {
-    return new Promise((resolve, reject) => {
-      request(options)
-      .then(res => {
-        resolve(res);
-      }, err => {
-        reject(`Request failed: ${err}`);
-      });
-    });
-  }
 }
 
 function replaceAll(haystack, needle, replace) {
@@ -103,6 +65,40 @@ function createQueryString(queryParams) {
     i++;
   }
   return queryString;
+}
+
+function getRequestOptions(path, method, headers, body, session) {
+  // Set default headers
+  headers["Content-Type"] = "application/json";
+  headers["Accept"] = "application/json";
+
+  var options = {
+    // Config for request-promise module
+    json: true,
+    resolveWithFullResponse: true,
+    simple: false,
+    timeout: 10000,
+    time: true,
+    // Request details
+    uri: path,
+    method: method,
+    headers: headers,
+    body: body,
+  };
+
+  if (session && session.cookies)
+    options.jar = session.cookies
+
+  return options;
+}
+
+function makeRequest(options) {
+  return new Promise((resolve, reject) => {
+    request(options).then(
+      res => {resolve(res);}, 
+      err => {reject(`Request failed: ${err}`);
+    });
+  });
 }
 
 class ClientError extends Error {
