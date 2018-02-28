@@ -86,8 +86,17 @@ function getRequestOptions(path, method, headers, body, session) {
     body: body,
   };
 
-  if (session && session.cookies)
+  if (session && session.cookies) {
     options.jar = session.cookies
+
+    var xsrfCookie = session.cookies.getCookies(path).find(function(cookie) {
+      return cookie.key == "XSRF-TOKEN";
+    });
+
+    if (xsrfCookie) {
+      headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrfCookie.value);
+    }
+  }
 
   return options;
 }
