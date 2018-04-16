@@ -20,7 +20,7 @@ export class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
     * {{{description}}}
     */
 {{/description}}
-    {{name}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
+    public {{name}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
 {{/vars}}
 }
 
@@ -91,11 +91,6 @@ class VoidAuth implements Authentication {
 */
 {{/description}}
 export class {{classname}} {
-    protected basePath = '{{basePath}}';
-    protected defaultHeaders : any = {};
-
-
-
     public authentications = {
         'default': <Authentication>new VoidAuth(),
 {{#authMethods}}
@@ -110,6 +105,9 @@ export class {{classname}} {
 {{/isOAuth}}
 {{/authMethods}}
     }
+
+    protected basePath = '{{basePath}}';
+    protected defaultHeaders : any = {};
 
     constructor(basePath?: string);
 {{#authMethods}}
