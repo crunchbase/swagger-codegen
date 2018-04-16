@@ -162,7 +162,7 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) : Promise<{ {{#returnType}}body: {{{returnType}}}; {{/returnType}}{{^returnType}}body?: any; {{/returnType}} }> {
+    public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Promise<{ {{#returnType}}body: {{{returnType}}}; {{/returnType}}{{^returnType}}body?: any; {{/returnType}} }> {
         const path = this.basePath + "{{path}}"{{#pathParams}}
             .replace("{" + "{{baseName}}" + "}", String({{paramName}})){{/pathParams}};
         let queryParameters: any = {};
@@ -205,7 +205,7 @@ export class {{classname}} {
 {{#bodyParam}}
             body: {{paramName}},
 {{/bodyParam}}
-        }
+        };
 
 {{#authMethods}}
         this.authentications.{{name}}.applyToRequest(requestOptions);
@@ -238,7 +238,7 @@ export class {{classname}} {
 */
 function combine<T,U>(first: T, second: U): T&U {
     for(let key in second){
-        if(second.hasOwnProperty(key)){
+        if (second.hasOwnProperty(key)) {
             (<any>first)[key] = second[key];
         }
     }
