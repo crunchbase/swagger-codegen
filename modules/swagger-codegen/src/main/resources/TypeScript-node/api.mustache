@@ -29,7 +29,7 @@ export namespace {{classname}} {
 {{#vars}}
 {{#isEnum}}
     export enum {{datatypeWithEnum}} { {{#allowableValues}}{{#values}}
-        {{.}} = <any> '{{.}}',{{/values}}{{/allowableValues}}
+        {{.}} = <any> "{{.}}",{{/values}}{{/allowableValues}}
     }
 {{/isEnum}}
 {{/vars}}
@@ -92,21 +92,21 @@ class VoidAuth implements Authentication {
 {{/description}}
 export class {{classname}} {
     public authentications = {
-        'default': <Authentication>new VoidAuth(),
+        "default": <Authentication>new VoidAuth(),
 {{#authMethods}}
 {{#isBasic}}
-        '{{name}}': new HttpBasicAuth(),
+        "{{name}}": new HttpBasicAuth(),
 {{/isBasic}}
 {{#isApiKey}}
-        '{{name}}': new ApiKeyAuth({{#isKeyInHeader}}'header'{{/isKeyInHeader}}{{^isKeyInHeader}}'query'{{/isKeyInHeader}}, '{{keyParamName}}'),
+        "{{name}}": new ApiKeyAuth({{#isKeyInHeader}}"header"{{/isKeyInHeader}}{{^isKeyInHeader}}"query"{{/isKeyInHeader}}, "{{keyParamName}}"),
 {{/isApiKey}}
 {{#isOAuth}}
-        '{{name}}': new OAuth(),
+        "{{name}}": new OAuth(),
 {{/isOAuth}}
 {{/authMethods}}
     }
 
-    protected basePath = '{{basePath}}';
+    protected basePath = "{{basePath}}";
     protected defaultHeaders : any = {};
 
     constructor(basePath?: string);
@@ -163,33 +163,33 @@ export class {{classname}} {
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
     public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) : Promise<{ {{#returnType}}body: {{{returnType}}}; {{/returnType}}{{^returnType}}body?: any; {{/returnType}} }> {
-        const path = this.basePath + '{{path}}'{{#pathParams}}
-            .replace('{' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
+        const path = this.basePath + "{{path}}"{{#pathParams}}
+            .replace("{" + "{{baseName}}" + "}", String({{paramName}})){{/pathParams}};
         let queryParameters: any = {};
         let headerParams: any = combine({}, this.defaultHeaders);
         let formParams: any = {};
 
 {{#allParams}}{{#required}}
-        // verify required parameter '{{paramName}}' is set
+        // verify required parameter "{{paramName}}" is set
         if (!{{paramName}}) {
-            throw new Error('Missing required parameter {{paramName}} when calling {{nickname}}');
+            throw new Error("Missing required parameter {{paramName}} when calling {{nickname}}");
         }
 {{/required}}{{/allParams}}
 {{#queryParams}}
         if ({{paramName}} !== undefined) {
-            queryParameters['{{baseName}}'] = {{paramName}};
+            queryParameters["{{baseName}}"] = {{paramName}};
         }
 
 {{/queryParams}}
 {{#headerParams}}
-        headerParams['{{baseName}}'] = {{paramName}};
+        headerParams["{{baseName}}"] = {{paramName}};
 
 {{/headerParams}}
         let useFormData = false;
 
 {{#formParams}}
         if ({{paramName}} !== undefined) {
-            formParams['{{baseName}}'] = {{paramName}};
+            formParams["{{baseName}}"] = {{paramName}};
         }
 {{#isFile}}
         useFormData = true;
@@ -197,7 +197,7 @@ export class {{classname}} {
 
 {{/formParams}}
         const requestOptions: any = {
-            method: '{{httpMethod}}',
+            method: "{{httpMethod}}",
             qs: queryParameters,
             headers: headerParams,
             uri: path,
