@@ -107,7 +107,7 @@ export class {{classname}} {
 {{/authMethods}}
     };
 
-    protected basePath = "{{basePath}}";
+    protected basePath = process.env.GATEWAY_PRIVATE + "/v4/";
     protected defaultHeaders: any = {};
 
     constructor(basePath?: string);
