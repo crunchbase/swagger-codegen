@@ -43,6 +43,11 @@ export interface ApiResult<T> {
     headers: {};
 }
 
+export interface ApiError {
+    message: string;
+    code: string;
+}
+
 {{#apiInfo}}{{#apis}}export class {{classname}} {
     private basePath = process.env.GATEWAY_PRIVATE + "/v4/";
     private defaultHeaders: any = {
@@ -51,7 +56,8 @@ export interface ApiResult<T> {
     };
 
 {{#operations}}{{#operation}}
-    /**{{#summary}}* {{summary}}{{/summary}}
+    /**
+     *{{#summary}} {{summary}}{{/summary}}
      {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
      {{/allParams}}*/
     public async {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}>> {
@@ -97,7 +103,8 @@ export interface ApiResult<T> {
             headers: headerParams,
             uri: path,
             json: true,
-            resolveWithFullResponse: true
+            resolveWithFullResponse: true,
+            simple: false
         };
 
         if (Object.keys(formParams).length) {
@@ -108,17 +115,27 @@ export interface ApiResult<T> {
             }
         }
 
-        try {
-            const response = await request(requestOptions);
-            const result: ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}> = {
+        const response = await request(requestOptions);
+
+        // Handle 200 status codes
+        if ((response.statusCode < 300) && (response.statusCode >= 200)) {
+            const apiResult: ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}> = {
                 body: response.body,
                 status: response.statusCode,
                 headers: response.headers
             };
-            return Promise.resolve(result);
-        } catch (error) {
-            return Promise.reject(error);
+
+            // We cannot return 'request' because it uses Bluebird
+            // under the hood, instead of native Promises
+            return Promise.resolve(apiResult);
         }
+
+        const apiError: ApiError = {
+            message: response.body.error,
+            code: response.body.code
+        };
+
+        return Promise.reject(apiError);
     }{{/operation}}{{/operations}}
 }{{/apis}}{{/apiInfo}}
 
