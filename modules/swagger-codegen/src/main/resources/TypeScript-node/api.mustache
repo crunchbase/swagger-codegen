@@ -12,14 +12,14 @@ import request from "request-promise";
 * {{{description}}}
 */
 {{/description}}
-export class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
+export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
 {{#vars}}
 {{#description}}
     /**
     * {{{description}}}
     */
 {{/description}}
-    public {{name}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
+    {{name}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
 {{/vars}}
 }
 
@@ -40,17 +40,21 @@ export namespace {{classname}} {
 export interface ApiResult<T> {
     status: number;
     body: T;
+    headers: {};
 }
 
 {{#apiInfo}}{{#apis}}export class {{classname}} {
     private basePath = process.env.GATEWAY_PRIVATE + "/v4/";
-    private defaultHeaders: any = {};
+    private defaultHeaders: any = {
+        "accept": "application/json",
+        "content-type": "application/json"
+    };
 
 {{#operations}}{{#operation}}
     /**{{#summary}}* {{summary}}{{/summary}}
      {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
      {{/allParams}}*/
-    public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}>> {
+    public async {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}>> {
         const path = this.basePath + "{{path}}"{{#pathParams}}
             .replace("{" + "{{baseName}}" + "}", String({{paramName}})){{/pathParams}};
         let queryParameters: any = {};
@@ -104,15 +108,17 @@ export interface ApiResult<T> {
             }
         }
 
-        return new Promise((resolve, reject) => {
-            request(requestOptions).then(response => {
-                const apiResult: ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}> = {
-                    body: response.body,
-                    status: response.statusCode
-                };
-                resolve(apiResult);
-            });
-        });
+        try {
+            const response = await request(requestOptions);
+            const result: ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}> = {
+                body: response.body,
+                status: response.statusCode,
+                headers: response.headers
+            };
+            return Promise.resolve(result);
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }{{/operation}}{{/operations}}
 }{{/apis}}{{/apiInfo}}
 
