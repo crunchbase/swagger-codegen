@@ -2,10 +2,7 @@
 // DO NOT MODIFY - GENERATED FILE
 //
 
-const request = require('request-promise');
-const Cookie = require('tough-cookie').Cookie;
-
-class Client {
+module.exports = class ApiFormatter {
   {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
   /*
    * {{summary}}
@@ -13,7 +10,7 @@ class Client {
 {{#allParams}}   * @param {{=<% %>=}}{<% dataType %>} <%={{ }}=%> {{paramName}} {{description}}
 {{/allParams}}   * @return Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>
    */
-  static {{nickname}}(host, session, {{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+  static {{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
     {{#allParams}}{{#required}}if ({{paramName}} == null) 
       throw new ClientError("Missing required parameter '{{paramName}}' when calling {{nickname}}");
     {{/required}}{{/allParams}}
@@ -36,12 +33,9 @@ class Client {
     {{/headerParams}}
 
     // Get request-promise module options from params, with defaults
-    const options = getRequestOptions(path, "{{httpMethod}}", headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}}, session);
-    return makeRequest(options);
+    return formatOptions(path, "{{httpMethod}}", headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}});
   }
   {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
-
-
 }
 
 function replaceAll(haystack, needle, replace) {
@@ -67,6 +61,15 @@ function createQueryString(queryParams) {
   return queryString;
 }
 
+function formatOptions(path, method, headers, body) {
+  return {
+    url: path,
+    method: method,
+    headers: headers,
+    body: body,
+  };
+}
+
 class ClientError extends Error {
   constructor(message, status) {
     super(message);
@@ -74,5 +77,3 @@ class ClientError extends Error {
     this.name = this.constructor.name;
   }
 }
-
-module.exports = Client;
