@@ -4,16 +4,49 @@
 
 /* tslint:disable:no-unused-variable */
 
+import request from "request-promise";
+
+{{#models}}{{#model}}
+{{#description}}
+/**
+* {{{description}}}
+*/
+{{/description}}
+export class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
+{{#vars}}
+{{#description}}
+    /**
+    * {{{description}}}
+    */
+{{/description}}
+    public {{name}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
+{{/vars}}
+}
+
+{{#hasEnums}}
+export namespace {{classname}} {
+{{#vars}}
+{{#isEnum}}
+    export enum {{datatypeWithEnum}} {
+{{#allowableValues}}{{#values}}
+        {{.}} = <any> "{{.}}",{{/values}}{{/allowableValues}}
+    }
+{{/isEnum}}
+{{/vars}}
+}
+{{/hasEnums}}
+{{/model}}{{/models}}
+
 export interface ApiResult<T> {
     status: number;
     body: T;
 }
 
-{{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
-export class {{classname}} {
+{{#apiInfo}}{{#apis}}export class {{classname}} {
     private basePath = process.env.GATEWAY_PRIVATE + "/v4/";
     private defaultHeaders: any = {};
 
+{{#operations}}{{#operation}}
     /**
      {{#summary}}* {{summary}}{{/summary}}
      {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
@@ -81,8 +114,8 @@ export class {{classname}} {
                 resolve(apiResult);
             });
         });
-    }
-}{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+    }{{/operation}}{{/operations}}
+}{{/apis}}{{/apiInfo}}
 
 /**
 * Combines two objects of different types.

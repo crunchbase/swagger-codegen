@@ -18,7 +18,6 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
         super();
         outputFolder = "generated-code/typescript-node";
         embeddedTemplateDir = templateDir = "TypeScript-node";
-        supportingFiles.add(new SupportingFile("apis.mustache", null, "apis.ts"));
-        supportingFiles.add(new SupportingFile("models.mustache", null, "models.ts"));
+        supportingFiles.add(new SupportingFile("api.mustache", null, "api.ts"));
     }
 }
