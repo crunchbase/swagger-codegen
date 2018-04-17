@@ -4,13 +4,13 @@
 
 /* tslint:disable:no-unused-variable */
 
-export default interface ApiResult<T> {
+export interface ApiResult<T> {
     status: number;
     body: T;
 }
 
 {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
-export default class {{classname}} {
+export class {{classname}} {
     private basePath = process.env.GATEWAY_PRIVATE + "/v4/";
     private defaultHeaders: any = {};
 
