@@ -1,6 +1,12 @@
 package io.swagger.codegen.languages;
 
+import java.io.File;
+import java.util.Map;
+
+import io.swagger.codegen.CodegenModel;
 import io.swagger.codegen.SupportingFile;
+import io.swagger.models.Model;
+import io.swagger.models.properties.*;
 
 public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen {
 
