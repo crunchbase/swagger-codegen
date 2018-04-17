@@ -47,8 +47,7 @@ export interface ApiResult<T> {
     private defaultHeaders: any = {};
 
 {{#operations}}{{#operation}}
-    /**
-     {{#summary}}* {{summary}}{{/summary}}
+    /**{{#summary}}* {{summary}}{{/summary}}
      {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
      {{/allParams}}*/
     public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}any{{/returnType}}>> {
