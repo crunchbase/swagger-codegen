@@ -2,10 +2,7 @@
 // DO NOT MODIFY - GENERATED FILE
 //
 
-const request = require('request-promise');
-const Cookie = require('tough-cookie').Cookie;
-
-class Client {
+module.exports = class ApiFormatter {
   {{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
   /*
    * {{summary}}
@@ -13,12 +10,12 @@ class Client {
 {{#allParams}}   * @param {{=<% %>=}}{<% dataType %>} <%={{ }}=%> {{paramName}} {{description}}
 {{/allParams}}   * @return Promise<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>
    */
-  static {{nickname}}(host, session, {{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+  static {{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
     {{#allParams}}{{#required}}if ({{paramName}} == null) 
       throw new ClientError("Missing required parameter '{{paramName}}' when calling {{nickname}}");
     {{/required}}{{/allParams}}
     // Get fully qualified path
-    let path = host + replaceAll("{{{path}}}", "\\{format\\}", "json");
+    let path = "{{{contextPath}}}" + replaceAll("{{{path}}}", "\\{format\\}", "json");
     {{#pathParams}}path = replaceAll(path, "\\{" + "{{baseName}}" + "\\}", encodeURIComponent({{{paramName}}}.toString()));
     {{/pathParams}}
     const queryParams = {};
@@ -36,12 +33,9 @@ class Client {
     {{/headerParams}}
 
     // Get request-promise module options from params, with defaults
-    const options = getRequestOptions(path, "{{httpMethod}}", headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}}, session);
-    return makeRequest(options);
+    return formatOptions(path, "{{httpMethod}}", headers, {{#bodyParam}}{{^isBinary}}{{paramName}}{{/isBinary}}{{#isBinary}}null{{/isBinary}}{{/bodyParam}}{{^bodyParam}}null{{/bodyParam}});
   }
   {{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
-
-
 }
 
 function replaceAll(haystack, needle, replace) {
@@ -67,46 +61,13 @@ function createQueryString(queryParams) {
   return queryString;
 }
 
-function getRequestOptions(path, method, headers, body, session) {
-  // Set default headers
-  headers["Content-Type"] = "application/json";
-  headers["Accept"] = "application/json";
-
-  var options = {
-    // Config for request-promise module
-    json: true,
-    resolveWithFullResponse: true,
-    simple: false,
-    time: true,
-    // Request details
-    uri: path,
+function formatOptions(path, method, headers, body) {
+  return {
+    url: path,
     method: method,
     headers: headers,
     body: body,
   };
-
-  if (session && session.cookies) {
-    options.jar = session.cookies;
-
-    var xsrfCookie = session.cookies.getCookies(path).find(function(cookie) {
-      return cookie.key == "XSRF-TOKEN";
-    });
-
-    if (xsrfCookie) {
-      options.headers["X-XSRF-TOKEN"] = decodeURIComponent(xsrfCookie.value);
-    }
-  }
-
-  return options;
-}
-
-function makeRequest(options) {
-  return new Promise((resolve, reject) => {
-    request(options).then(
-      res => {resolve(res);}, 
-      err => {reject(`Request failed: ${err}`);
-    });
-  });
 }
 
 class ClientError extends Error {
@@ -116,8 +77,3 @@ class ClientError extends Error {
     this.name = this.constructor.name;
   }
 }
-
-module.exports = {
-  Client,
-  ClientError
-};
