@@ -23,7 +23,9 @@ import { ApiHelperService } from '../api-helper.service';
 * {{&description}}
 */
 {{/description}}
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class {{classname}} {
   public defaultHeaders: any = {};
 
