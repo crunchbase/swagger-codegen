@@ -4,8 +4,8 @@
 
 /* tslint:disable:no-unused-variable member-ordering max-line-length no-string-literal no-trailing-whitespace */
 
-import { Injectable, Inject } from '@angular/core';
-import { Headers, RequestOptionsArgs, URLSearchParams } from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { {{#imports}}{{import}}{{^-last}},
          {{/-last}}{{/imports}} } from '../api';
@@ -27,7 +27,6 @@ import { ApiHelperService } from '../api-helper.service';
   providedIn: "root"
 })
 export class {{classname}} {
-  public defaultHeaders: any = {};
 
   private logger: Logger;
 
@@ -42,13 +41,21 @@ export class {{classname}} {
    * {{notes}}
    {{#allParams}}* @param {{paramName}} {{description}}
    {{/allParams}}*/
-  public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{^-last}}, {{/-last}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}>> {
+  public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{^-last}}, {{/-last}}{{/allParams}}): Promise<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}>> {
+    return this.{{nickname}}$.apply(this, arguments).toPromise();
+  }
+
+  /**
+   * {{summary}}
+   * {{notes}}
+   {{#allParams}}* @param {{paramName}} {{description}}
+   {{/allParams}}*/
+  public {{nickname}}$({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}{{^-last}}, {{/-last}}{{/allParams}}): Observable<ApiResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}>> {
     const path = '{{basePathWithoutHost}}' +
       '{{path}}'{{#pathParams}}
       .replace('{' + '{{baseName}}' + '}', {{paramName}} + ''){{/pathParams}};
 
-    let search = new URLSearchParams();
-    let headers = new Headers(this.defaultHeaders);
+    let params = {};
 
 {{#allParams}}
 {{#required}}
@@ -60,24 +67,18 @@ export class {{classname}} {
 {{/allParams}}
 {{#queryParams}}
     if ({{paramName}} !== undefined) {
-      search.set('{{baseName}}', '' + {{paramName}});
+      params['{{baseName}}'] = '' + {{paramName}};
     }
 
 {{/queryParams}}
-{{#headerParams}}
-    headers.append('{{baseName}}', {{paramName}});
-{{/headerParams}}
 
-    let requestOptions: RequestOptionsArgs = {
-      method: '{{httpMethod}}',
+    const requestArgs = {
 {{#bodyParam}}      body: {{paramName}},{{/bodyParam}}
-      search: search,
-      // Don't include headers as they'll override global defaults
-      // headers: headers
+      params
     };
 
     this.logger.debug('Executing {{httpMethod}} request to ' + path);
-    return this.apiHelperService.createResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}>(path, requestOptions);
+    return this.apiHelperService.createResult<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}>("{{httpMethod}}", path, requestArgs);
   }
 
 {{/operation}}
