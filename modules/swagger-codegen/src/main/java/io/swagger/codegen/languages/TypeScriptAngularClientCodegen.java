@@ -91,6 +91,12 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
         return m;
     }
 
+    @Override
+    protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Property property) {
+        codegenModel.additionalPropertiesType = getTypeDeclaration(property);
+        addImport(codegenModel, codegenModel.additionalPropertiesType);
+    }
+
     private class EnumEntryLambda extends CustomLambda {
         @Override
         public String formatFragment(String fragment) {

@@ -847,8 +847,7 @@ public class DefaultCodegen {
                 m.dataType = getSwaggerType(p);
             }
             if (impl.getAdditionalProperties() != null) {
-                MapProperty mapProperty = new MapProperty(impl.getAdditionalProperties());
-                addParentContainer(m, name, mapProperty);
+                addAdditionPropertiesToCodeGenModel(m, impl.getAdditionalProperties());
             }
             addVars(m, impl.getProperties(), impl.getRequired());
         }
@@ -1094,6 +1093,11 @@ public class DefaultCodegen {
             setNonArrayMapProperty(property, type);
         }
         return property;
+    }
+
+    protected void addAdditionPropertiesToCodeGenModel(CodegenModel codegenModel, Property property) {
+        MapProperty mapProperty = new MapProperty(property);
+        addParentContainer(codegenModel, codegenModel.name, mapProperty);
     }
 
     protected void setNonArrayMapProperty(CodegenProperty property, String type) {
@@ -1890,7 +1894,7 @@ public class DefaultCodegen {
         }
     }
 
-    private void addImport(CodegenModel m, String type) {
+    protected void addImport(CodegenModel m, String type) {
         if (type != null && needToImport(type)) {
             if (!type.endsWith("Model")) {
               type = type + "Model";
