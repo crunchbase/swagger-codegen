@@ -15,6 +15,8 @@
  */
 {{/description}}
 export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
+{{#additionalPropertiesType}}  [key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};
+{{/additionalPropertiesType}}
 {{#vars}}   {{name}}{{^required}}?{{/required}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};  // {{#description}}{{{description}}}{{/description}}
 {{/vars}}
 }

@@ -10,6 +10,7 @@ public class CodegenModel {
     public String classFileName;
     public String unescapedDescription;
     public String defaultValue;
+    public String additionalPropertiesType;
     public List<CodegenProperty> vars = new ArrayList<CodegenProperty>();
     public List<String> allowableValues;
 
