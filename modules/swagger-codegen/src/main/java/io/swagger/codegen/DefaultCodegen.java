@@ -332,7 +332,7 @@ public class DefaultCodegen {
      * @return the Enum name
      */
     public String toEnumName(CodegenProperty property) {
-        return StringUtils.capitalize(property.name) + "Enum";
+        return camelize(property.name) + "Enum";
     }
 
     /**
