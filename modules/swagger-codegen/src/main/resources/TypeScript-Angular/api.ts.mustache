@@ -5,14 +5,14 @@
 /* tslint:disable:no-unused-variable member-ordering max-line-length no-string-literal no-trailing-whitespace  */
 
 /*
-* Models
-*/
+ * Models
+ */
 {{#models}}
 {{#model}}
 {{#description}}
 /**
-* {{{description}}}
-*/
+ * {{{description}}}
+ */
 {{/description}}
 export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}  [key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};
@@ -25,13 +25,14 @@ export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
 export namespace {{classname}} {
 {{#vars}}
 {{#isEnum}}
-    export enum {{datatypeWithEnum}} {
-    {{#allowableValues}}{{#values}}  {{#fnEnumEntry}}{{.}}{{/fnEnumEntry}} = '{{.}}',
-    {{/values}}{{/allowableValues}}
-    }
+
+  export enum {{datatypeWithEnum}} {
+{{#allowableValues}}{{#values}}     {{#fnEnumEntry}}{{.}}{{/fnEnumEntry}} = '{{.}}',
+{{/values}}{{/allowableValues}}
+  }
 {{/isEnum}}
 {{/vars}}
-    }
+}
 {{/hasEnums}}
 
 {{/model}}
