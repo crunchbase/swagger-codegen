@@ -27,7 +27,7 @@ export namespace {{classname}} {
 {{#isEnum}}
 
   export enum {{datatypeWithEnum}} {
-{{#allowableValues}}{{#values}}     {{#fnEnumEntry}}{{.}}{{/fnEnumEntry}} = <any> '{{.}}',
+{{#allowableValues}}{{#values}}     {{#fnEnumEntry}}{{.}}{{/fnEnumEntry}} = '{{.}}',
 {{/values}}{{/allowableValues}}
   }
 {{/isEnum}}
