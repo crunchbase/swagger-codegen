@@ -8,6 +8,7 @@ import io.swagger.models.auth.SecuritySchemeDefinition;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.util.Json;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,6 +238,12 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             for (String tag : paths.keySet()) {
                 try {
                     List<CodegenOperation> ops = paths.get(tag);
+                    Collections.sort(ops, new Comparator<CodegenOperation>() {
+                        @Override
+                        public int compare(CodegenOperation one, CodegenOperation another) {
+                            return ObjectUtils.compare(one.operationId, another.operationId);
+                        }
+                    });
                     Map<String, Object> operation = processOperations(config, tag, ops);
 
                     operation.put("basePath", basePath);
