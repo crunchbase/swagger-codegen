@@ -81,7 +81,7 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
     }
 
     private String toConventionalFilename(String name) {
-        return name.toLowerCase().replaceAll("[_]", "-");
+        return dashize(underscore(name));
     }
 
     @Override
