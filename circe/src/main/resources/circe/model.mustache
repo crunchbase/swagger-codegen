@@ -10,8 +10,6 @@ package {{modelPackage}}
 import io.circe._
 import io.circe.generic.semiauto._
 
-import {{classname}}._
-
 {{#models}}
 {{#model}}
 case class {{classname}}(
@@ -44,16 +42,20 @@ object {{classname}} {
     }
 
     implicit val {{name}}Decoder: Decoder[{{nameInCamelCase}}] = (hCursor: HCursor) =>
-      hCursor.as[String].flatMap {
-        {{#allowableValues}}{{#values}}case "{{.}}" => Right({{#titlecase}}{{.}}{{/titlecase}})
-        {{/values}}{{/allowableValues}}case _ => Left(DecodingFailure.fromThrowable(new RuntimeException("Unknown {{name}}"), List.empty))
+      hCursor.as[String].flatMap { s =>
+        {{nameInCamelCase}}.apply(s).fold[Decoder.Result[{{nameInCamelCase}}]](Left(DecodingFailure.fromThrowable(new RuntimeException("Unknown {{name}}"), List.empty)))(Right(_))
       }
+
+    def apply(s: String): Option[{{nameInCamelCase}}] = s match {
+      {{#allowableValues}}{{#values}}case "{{.}}" => Some({{#titlecase}}{{.}}{{/titlecase}})
+      {{/values}}{{/allowableValues}}case _ => None
+    }
   }
   {{/isEnum}}
 {{/vars}}
 
-  implicit val {{className}}Encoder: Encoder[{{classname}}] = deriveEncoder
-  implicit val {{className}}Decoder: Decoder[{{classname}}] = deriveDecoder
+  implicit val {{classname}}Encoder: Encoder[{{classname}}] = deriveEncoder
+  implicit val {{classname}}Decoder: Decoder[{{classname}}] = deriveDecoder
 }
 {{/model}}
 {{/models}}

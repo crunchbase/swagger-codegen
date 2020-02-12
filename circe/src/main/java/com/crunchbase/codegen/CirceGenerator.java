@@ -1,5 +1,6 @@
 package com.crunchbase.codegen;
 
+import com.google.common.base.Strings;
 import io.swagger.codegen.*;
 import io.swagger.codegen.mustache.*;
 import io.swagger.models.*;
@@ -69,7 +70,7 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
     /**
      * Model Package.  Optional, if needed, this can be used in templates
      */
-    modelPackage = packageName + ".model";
+    modelPackage = packageName + ".http.codegen";
 
     /**
      * Reserved words.  Override this with reserved words specific to your language
@@ -180,8 +181,8 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
         "Object")
     );
 
-    instantiationTypes.put("array", "ArrayList");
-    instantiationTypes.put("map", "HashMap");
+    instantiationTypes.put("array", "java.util.ArrayList");
+    instantiationTypes.put("map", "java.util.HashMap");
 
     importMapping = new HashMap<String, String>();
     importMapping.put("BigDecimal", "java.math.BigDecimal");
@@ -233,8 +234,18 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
    */
   @Override
   public CodegenModel fromModel(String name, Model model, Map<String, Model> allDefinitions) {
-      CodegenModel codegenModel = super.fromModel(name, model, allDefinitions);
-      return codegenModel;
+    CodegenModel codegenModel = super.fromModel(name, model, allDefinitions);
+    return codegenModel;
+  }
+
+  @Override
+  public void processOpts() {
+    super.processOpts();
+
+    this.setModelPackage(sanitizePackageName(modelPackage));
+    if (additionalProperties.containsKey(CodegenConstants.MODEL_PACKAGE)) {
+      this.additionalProperties.put(CodegenConstants.MODEL_PACKAGE, modelPackage);
+    }
   }
 
   @Override
@@ -324,7 +335,7 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
   }
 
   /**
-   * Optional - swagger type conversion.  This is used to map swagger types in a `Property` into 
+   * Optional - swagger type conversion.  This is used to map swagger types in a `Property` into
    * either language specific types via `typeMapping` or into complex models if there is not a mapping.
    *
    * @return a string value of the type or complex model for this property
@@ -357,5 +368,14 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
 
   public void setPackageName(String packageName) {
     this.packageName = packageName;
+  }
+
+  private String sanitizePackageName(String packageName) {
+    packageName = packageName.trim();
+    packageName = packageName.replaceAll("[^a-zA-Z0-9_\\.]", "_");
+    if (Strings.isNullOrEmpty(packageName)) {
+      return "invalidPackageName";
+    }
+    return packageName;
   }
 }
