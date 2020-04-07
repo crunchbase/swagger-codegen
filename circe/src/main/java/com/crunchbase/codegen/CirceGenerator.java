@@ -75,7 +75,7 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
     /**
      * Reserved words.  Override this with reserved words specific to your language
      */
-    setReservedWordsLowerCase(
+    reservedWords = new HashSet<String>(
       Arrays.asList(
         // Scala
         "abstract", "case", "catch", "class", "def",
@@ -162,27 +162,21 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
      * the client generator
      */
     languageSpecificPrimitives = new HashSet<String>(
-      Arrays.asList(
-        "Type1",      // replace these with your types
-        "Type2")
+            Arrays.asList(
+                    "String",
+                    "boolean",
+                    "Boolean",
+                    "Double",
+                    "Int",
+                    "Long",
+                    "Float",
+                    "Object",
+                    "List",
+                    "Seq",
+                    "Map")
     );
-    languageSpecificPrimitives = new HashSet<String>(
-      Arrays.asList(
-        "String",
-        "Boolean",
-        "Double",
-        "Int",
-        "Integer",
-        "Long",
-        "Float",
-        "Any",
-        "AnyVal",
-        "AnyRef",
-        "Object")
-    );
-
-    instantiationTypes.put("array", "java.util.ArrayList");
-    instantiationTypes.put("map", "java.util.HashMap");
+    instantiationTypes.put("array", "ListBuffer");
+    instantiationTypes.put("map", "Map");
 
     importMapping = new HashMap<String, String>();
     importMapping.put("BigDecimal", "java.math.BigDecimal");
@@ -198,6 +192,10 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
     importMapping.put("LocalDateTime", "java.time.LocalDateTime");
     importMapping.put("LocalDate", "java.time.LocalDate");
     importMapping.put("LocalTime", "java.time.LocalTime");
+    importMapping.remove("Seq");
+    importMapping.remove("List");
+    importMapping.remove("Set");
+    importMapping.remove("Map");
 
     cliOptions.clear();
     cliOptions.add(new CliOption(CodegenConstants.PACKAGE_NAME, "Models package name (e.g. io.swagger).")
@@ -213,7 +211,10 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
    */
   @Override
   public String escapeReservedWord(String name) {
-    return "_" + name;  // add an underscore to the name
+    if (this.reservedWordsMappings().containsKey(name)) {
+      return this.reservedWordsMappings().get(name);
+    }
+    return "`" + name + "`";
   }
 
   /**
