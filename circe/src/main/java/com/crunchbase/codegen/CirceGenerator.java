@@ -125,14 +125,14 @@ public class CirceGenerator extends DefaultCodegen implements CodegenConfig {
     typeMapping.put("double", "Double");
     typeMapping.put("number", "BigDecimal");
     typeMapping.put("date-time", "OffsetDateTime");
-    typeMapping.put("date", "LocalDateTime");
+    typeMapping.put("date", "LocalDate");
     typeMapping.put("file", "File");
     typeMapping.put("array", "Seq");
     typeMapping.put("list", "List");
     typeMapping.put("map", "Map");
-    typeMapping.put("object", "Object");
+    typeMapping.put("object", "Json");
     typeMapping.put("binary", "Array[Byte]");
-    typeMapping.put("Date", "LocalDateTime");
+    typeMapping.put("Date", "LocalDate");
     typeMapping.put("DateTime", "OffsetDateTime");
 
     /**

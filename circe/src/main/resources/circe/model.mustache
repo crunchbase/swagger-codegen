@@ -13,18 +13,18 @@ import io.circe.generic.semiauto._
 
 {{#models}}
 {{#model}}
-case class {{classname}}(
+final case class {{classname}}(
 {{#vars}}
   {{#isEnum}}
     {{^isListContainer}}
-  {{{name}}}: {{^required}}Option[{{/required}}{{classname}}.{{nameInCamelCase}}{{^required}}]{{/required}}{{^-last}},{{/-last}}
+  {{{name}}}: {{^required}}Option[{{/required}}{{classname}}.{{nameInCamelCase}}{{^required}}] = None{{/required}}{{^-last}},{{/-last}}
     {{/isListContainer}}
     {{#isListContainer}}
-  {{{name}}}: {{^required}}Option[{{/required}}Seq[{{classname}}.{{enumName}}]{{^required}}]{{/required}}{{^-last}},{{/-last}}
+  {{{name}}}: {{^required}}Option[{{/required}}Seq[{{classname}}.{{nameInCamelCase}}]{{^required}}] = None{{/required}}{{^-last}},{{/-last}}
     {{/isListContainer}}
   {{/isEnum}}
   {{^isEnum}}
-  {{{name}}}: {{^required}}Option[{{/required}}{{datatype}}{{^required}}]{{/required}}{{^-last}},{{/-last}}
+  {{{name}}}: {{^required}}Option[{{/required}}{{datatype}}{{^required}}] = None{{/required}}{{^-last}},{{/-last}}
   {{/isEnum}}
 {{/vars}}
 )
